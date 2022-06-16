@@ -43,7 +43,7 @@ function App() {
         }}
       />
       <button onClick={sendMessage}> Send Message</button>
-      <h1> Message:</h1>
+      <h1 className="text-3xl font-bold underline"> Message:</h1>
       {messageReceived}
     </div>
   );
