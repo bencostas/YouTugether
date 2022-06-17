@@ -3,13 +3,11 @@
 @tailwind utilities;
 
 .App {
-  width: 100vw;
-  height: 100vh;
-  background: #fff;
-  color: #000000;
-  font-family: "Open Sans", sans-serif;
-  display: grid;
-  place-items: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 body {
   margin: 0%;
