@@ -6,20 +6,44 @@ import Logo from "./Components/logo.svg"
 
 const socket = io.connect("http://localhost:3001");
 
+
+function createID() {
+  let code = [];
+  let hex = "0123456789";
+  for (let i = 0; i < 5; i++) {
+    code[i] = hex[Math.floor(Math.random() * 10)];
+  }
+  return code.join("");
+}
+
+const id = createID();
+
 function App() {
+
   const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState(id);
   const [showChat, setShowChat] = useState(false);
 
   const joinRoom = () => {
-    if (username !== "" && room !== "") {
+    if (username !== "" && room !== id) {
       socket.emit("join_room", room);
       setShowChat(true);
     }
     else {
-      alert("Username and Room ID must be filled to enter a room!")
+      alert("Username and Room ID must be filled to join a room!")
     }
   };
+
+  const createRoom = () => {
+    if (username !== "") {
+      socket.emit("join_room", room);
+      setShowChat(true);
+    }
+    else {
+      alert("Username must be filled to create a room!")
+    }
+  };
+
 
   return (
     <div className="App">
@@ -36,7 +60,7 @@ function App() {
               onChange={(event) => {
                 setUsername(event.target.value);
               }}></input>
-              <button class="self-center w-36 bg-red-500 text-white py-3 px-2 rounded-full">Create Room</button>
+              <button class="self-center w-36 bg-red-500 text-white py-3 px-2 rounded-full" onClick={createRoom}>Create Room</button>
             </div>
             <div className="flex flex-row gap-x-4 justify-around">
               <input
