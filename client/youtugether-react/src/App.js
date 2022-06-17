@@ -6,7 +6,6 @@ import Logo from "./Components/logo.svg"
 
 const socket = io.connect("http://localhost:3001");
 
-
 function createID() {
   let code = [];
   let hex = "0123456789";
@@ -36,14 +35,13 @@ function App() {
 
   const createRoom = () => {
     if (username !== "") {
-      socket.emit("join_room", room);
+      socket.emit("create_room", room);
       setShowChat(true);
     }
     else {
       alert("Username must be filled to create a room!")
     }
   };
-
 
   return (
     <div className="App">

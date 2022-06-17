@@ -9,13 +9,17 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin:    `http://localhost:3000`,
     methods: ["GET", "POST"],
   },
 });
 
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
+
+  socket.on("create_room", (room) => {
+    console.log(`room ${room} was created`);
+  });
 
   socket.on("join_room", (data) => {
     socket.join(data);
