@@ -25,7 +25,7 @@ function App() {
 
   const joinRoom = () => {
     if (username !== "" && room !== id) {
-      socket.emit("join_room", room);
+      socket.emit("join_room", {room, username});
       setShowChat(true);
     }
     else {
@@ -35,7 +35,7 @@ function App() {
 
   const createRoom = () => {
     if (username !== "") {
-      socket.emit("create_room", room);
+      socket.emit("create_room", {room, username});
       setShowChat(true);
     }
     else {
@@ -74,7 +74,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <Room socket={socket} username={socket.id} room={room} />
+        <Room socket={socket} username={username} room={room} socketID={socket.id} />
       )}
     </div>
   );

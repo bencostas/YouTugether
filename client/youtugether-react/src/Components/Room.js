@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
 
-function Room({ socket, username, room }) {
+function Room({ socket, username, room, socketID }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
 
@@ -11,6 +11,7 @@ function Room({ socket, username, room }) {
         room: room,
         author: username,
         message: currentMessage,
+        socketID: socketID,
         time:
           new Date(Date.now()).getHours() +
           ":" +
@@ -30,46 +31,59 @@ function Room({ socket, username, room }) {
   }, [socket]);
 
   return (
-    <div className="chat-window">
-      <div className="chat-header">
-        <p>Live Chat</p>
-        <p>{room}</p>
-      </div>
-      <div className="chat-body">
-        <ScrollToBottom className="message-container">
-          {messageList.map((messageContent) => {
-            return (
-              <div
-                className="message"
-                id={username === messageContent.author ? "you" : "other"}
-              >
-                <div>
-                  <div className="message-content">
-                    <p>{messageContent.message}</p>
-                  </div>
-                  <div className="message-meta">
-                    <p id="time">{messageContent.time}</p>
-                    <p id="author">{messageContent.author}</p>
-                  </div>
-                </div>
+    <div class="flex flex-col w-full">
+      <div class="mt-10 justify-around flex flex-row w-full h-96">
+        <div class="bg-gray-700 w-2/5 text-white rounded-3xl">
+          <div class="bg-gray-800 py-2 rounded-t-3xl w-full ">
+          YouTube Video Queue
+          </div>
+        </div>
+        <div class="flex flex-col w-2/5">
+          <div class="bg-gray-800 py-2 rounded-t-3xl text-white">
+          Live Chat
+          </div>
+          <div className="bg-gray-700 text-white overflow-auto">
+              
+            <div className="overflow-auto">
+              <div className="overflow-auto ">
+                <ScrollToBottom className="overflow-auto">
+                  {messageList.map((messageContent) => {
+                    return (
+                      <div
+                        className="message"
+                        id={socketID === messageContent.socketID ? "you" : "other"}
+                      >
+                        <div>
+                          <div className="message-content">
+                            <p>{messageContent.message}</p>
+                          </div>
+                          <div className="message-meta">
+                            <p id="time">{messageContent.time}</p>
+                            <p id="author">{messageContent.author}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </ScrollToBottom>
               </div>
-            );
-          })}
-        </ScrollToBottom>
-      </div>
-      <div className="chat-footer">
-        <input
-          type="text"
-          value={currentMessage}
-          placeholder="Hey..."
-          onChange={(event) => {
-            setCurrentMessage(event.target.value);
-          }}
-          onKeyPress={(event) => {
-            event.key === "Enter" && sendMessage();
-          }}
-        />
-        <button onClick={sendMessage}>&#9658;</button>
+            </div>
+          </div>
+            <div class="flex flex-row justify-around bg-gray-800 rounded-b-3xl p-2">
+              <input
+                type="text"
+                value={currentMessage}
+                placeholder="Hey..."
+                onChange={(event) => {
+                  setCurrentMessage(event.target.value);
+                }}
+                onKeyPress={(event) => {
+                  event.key === "Enter" && sendMessage();
+                }}
+              />
+              <button onClick={sendMessage}>&#9658;</button>
+            </div>
+        </div>
       </div>
     </div>
   );
