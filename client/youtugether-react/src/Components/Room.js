@@ -42,38 +42,26 @@ function Room({ socket, username, room, socketID }) {
           <div class="bg-gray-800 py-2 rounded-t-3xl text-white">
           Live Chat
           </div>
-          <div className="bg-gray-700 text-white overflow-auto">
-              
-            <div className="overflow-auto">
-              <div className="overflow-auto ">
-                <ScrollToBottom className="overflow-auto">
-                  {messageList.map((messageContent) => {
-                    return (
-                      <div
-                        className="message"
-                        id={socketID === messageContent.socketID ? "you" : "other"}
-                      >
-                        <div>
-                          <div className="message-content">
-                            <p>{messageContent.message}</p>
-                          </div>
-                          <div className="message-meta">
-                            <p id="time">{messageContent.time}</p>
-                            <p id="author">{messageContent.author}</p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </ScrollToBottom>
-              </div>
-            </div>
+          <div class="bg-gray-700 text-white overflow-y-auto h-full">
+            <ScrollToBottom>
+              {messageList.map((messageContent) => {
+                return (
+                  <div>
+                    <div class="flex flex-row px-4 py-1 border-b border-gray-500 min-w-full min-h-fit overflow-hidden inline">
+                      <p class="text-left text-yellow-300">{messageContent.author} </p> 
+                      <p class="text-left inline break-words">: {messageContent.message}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </ScrollToBottom>
           </div>
             <div class="flex flex-row justify-around bg-gray-800 rounded-b-3xl p-2">
               <input
+                class="bg-neutral-50 shadow appearance-none border rounded py-1 w-3/5 px-3 placeholder:text-black leading-tight focus:outline-none focus:shadow-outline"
                 type="text"
                 value={currentMessage}
-                placeholder="Hey..."
+                placeholder="Type Here"
                 onChange={(event) => {
                   setCurrentMessage(event.target.value);
                 }}
@@ -81,7 +69,7 @@ function Room({ socket, username, room, socketID }) {
                   event.key === "Enter" && sendMessage();
                 }}
               />
-              <button onClick={sendMessage}>&#9658;</button>
+              <button class="text-white bg-sky-600 px-4 rounded" onClick={sendMessage}>Send</button>
             </div>
         </div>
       </div>
