@@ -15,6 +15,12 @@ function createID() {
   return code.join("");
 }
 
+function randomHSL(){
+  return "hsla(" + ~~(360 * Math.random()) + "," + "70%,"+ "80%,0.9)"
+}
+
+const randomColor = randomHSL();
+
 const id = createID();
 
 function App() {
@@ -74,7 +80,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <Room socket={socket} username={username} room={room} socketID={socket.id} />
+        <Room socket={socket} username={username} room={room} socketID={socket.id} color={randomColor} />
       )}
     </div>
   );
