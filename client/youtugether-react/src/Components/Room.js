@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
-import 'get-youtube-title'
+import YouTube from 'react-youtube';
 
 function Room({ socket, username, room, socketID, color }) {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -37,8 +37,7 @@ function Room({ socket, username, room, socketID, color }) {
         var videoID = matches[1];
         // add to videoQueue
         await socket.emit("send_video", {videoID, room});
-        setVideoQueue((list) => [...list, videoID]);
-        console.log(videoQueue)
+        setVideoQueue((list) => [...list, {videoID, room}]);
         setVideo("");
     }
     else {
@@ -52,16 +51,23 @@ function Room({ socket, username, room, socketID, color }) {
     });
   }, [socket]);
 
-  // const getTitle = (videoData) => {
-  //   var title = require('get-youtube-title');
-  //   title(videoData, (e, t) => {
-  //     return t;
-  //   })
+  // const getTitle = async (videoID) => {
+  //   const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&fields=items(snippet(title))&part=snippet`;
+  //   const obj = await (await fetch(url)).json();
+  //   console.log(JSON.stringify(obj.items[0].snippet.title));
+      
   // };
-
+  const opts = {
+    height: '500',
+    width: '700',
+    playerVars: {
+      // https://developers.google.com/youtube/player_parameters
+      autoplay: 1,
+    },
+  }
 
   return (
-    <div class="flex flex-col w-full">
+    <div class="justify-center flex flex-col w-full">
       <div class="mt-5 text-xl font-semibold">
         You are in Room: {room}
       </div>
@@ -72,11 +78,11 @@ function Room({ socket, username, room, socketID, color }) {
           </div>
           <div class="bg-gray-700 text-white overflow-y-auto h-full">
             <ScrollToBottom>
-              {videoQueue.map((videoData) => {
+              {videoQueue.map((videoData, index) => {
                 return (
-                  <div>
+                  <div key={index}>
                     <div class="justify-around flex flex-row px-4 py-1 border-b border-gray-500 min-w-full min-h-fit overflow-hidden inline"> 
-                      <p class="text-left inline break-words">{videoData}</p>
+                      <p class="text-left inline break-words">https://www.youtube.com/watch?v={videoData.videoID}</p>
                     </div>
                   </div>
                 );
@@ -133,6 +139,9 @@ function Room({ socket, username, room, socketID, color }) {
               <button class="text-white bg-sky-600 px-4 rounded" onClick={sendMessage}>Send</button>
             </div>
         </div>
+      </div>
+      <div class="flex self-center mt-5 align-center">
+        <YouTube videoId={videoQueue[0]} opts={opts}/>
       </div>
     </div>
   );

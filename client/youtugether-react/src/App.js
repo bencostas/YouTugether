@@ -16,7 +16,8 @@ function createID() {
 }
 
 function randomHSL(){
-  return "hsla(" + ~~(360 * Math.random()) + "," + "70%,"+ "80%,0.9)"
+  // eslint-disable-next-line
+  return "hsla(" + ~~(360 * Math.random()) + "," + "70%,"+ "80%,0.9)";
 }
 
 const randomColor = randomHSL();

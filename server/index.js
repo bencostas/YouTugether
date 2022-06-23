@@ -32,7 +32,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_video", (data) => {
-    socket.to(data.room).emit("receive_video", data.video);
+    socket.to(data.room).emit("receive_video", data);
   });
 
   socket.on("disconnect", () => {
