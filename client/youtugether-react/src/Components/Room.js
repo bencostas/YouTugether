@@ -7,6 +7,7 @@ function Room({ socket, username, room, socketID, color }) {
   const [messageList, setMessageList] = useState([]);
   const [video, setVideo] = useState("");
   const [videoQueue, setVideoQueue] = useState([]);
+  const [currentVideo, setCurrentVideo] = useState([]);
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -38,6 +39,9 @@ function Room({ socket, username, room, socketID, color }) {
         // add to videoQueue
         await socket.emit("send_video", {videoID, room});
         setVideoQueue((list) => [...list, {videoID, room}]);
+        if (videoQueue.length == 1) {
+          setCurrentVideo(videoQueue[0].videoID);
+        }
         setVideo("");
     }
     else {
@@ -48,23 +52,43 @@ function Room({ socket, username, room, socketID, color }) {
   useEffect(() => {
     socket.off("receive_video").on("receive_video", (data) => {
       setVideoQueue((list) => [...list, data]);
+      if (videoQueue.length == 1) {
+        setCurrentVideo(videoQueue[0].videoID);
+      }
     });
   }, [socket]);
 
-  // const getTitle = async (videoID) => {
-  //   const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${API_KEY}&fields=items(snippet(title))&part=snippet`;
-  //   const obj = await (await fetch(url)).json();
-  //   console.log(JSON.stringify(obj.items[0].snippet.title));
-      
-  // };
   const opts = {
     height: '500',
     width: '700',
     playerVars: {
       // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
+      mute: 1,
     },
   }
+
+  // Play next video in queue 
+  const playNext = async() => {
+    // Update Video Queue
+    setVideoQueue((videos) => videos.filter((_, index) => index !== 0));
+    console.log(videoQueue[0]);
+    await socket.emit("play_next", room);
+    // Set new videoQueue[0] to currentVideo
+    if (videoQueue[0].videoID == null) {
+      setCurrentVideo("");
+    }
+    else {
+      setCurrentVideo(videoQueue[0].videoID)
+    }
+  }
+
+  useEffect(() => {
+    socket.off("update_play_next").on("update_play_next", (data) => {
+      setVideoQueue((videos) => videos.filter((_, index) => index !== 0));
+      setCurrentVideo(videoQueue[0].videoID)
+    });
+  }, [socket]);
 
   return (
     <div class="justify-center flex flex-col w-full">
@@ -140,8 +164,11 @@ function Room({ socket, username, room, socketID, color }) {
             </div>
         </div>
       </div>
+        {currentVideo}
       <div class="flex self-center mt-5 align-center">
-        <YouTube videoId={videoQueue[0]} opts={opts}/>
+        <YouTube videoId={currentVideo} opts={opts} onEnd={playNext}/>
+        
+        <button onClick={playNext}> Press to Skip </button>
       </div>
     </div>
   );

@@ -38,6 +38,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
   });
+
+  socket.on("play_next", (data) => {
+    socket.to(data).emit("update_play_next", data);
+  });
 });
 
 server.listen(3001, () => {
