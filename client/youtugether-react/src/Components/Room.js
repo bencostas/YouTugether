@@ -6,7 +6,6 @@ function Room({ socket, username, room, socketID, color }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
   const [video, setVideo] = useState("");
-  const [videoQueue, setVideoQueue] = useState([]);
   const [currentVideo, setCurrentVideo] = useState([]);
 
   const sendMessage = async () => {
@@ -18,7 +17,6 @@ function Room({ socket, username, room, socketID, color }) {
         socketID: socketID,
         color: color
       };
-
       await socket.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
@@ -36,27 +34,23 @@ function Room({ socket, username, room, socketID, color }) {
     var matches = video.match(p);
     if(matches){
         var videoID = matches[1];
-        // add to videoQueue
-        await socket.emit("send_video", {videoID, room});
-        setVideoQueue((list) => [...list, {videoID, room}]);
-        if (videoQueue.length == 1) {
-          setCurrentVideo(videoQueue[0].videoID);
+        const messageData = {
+          room: room,
+          author: username,
+          message: `Playing video: https://www.youtube.com/watch?v=`+ videoID,
+          socketID: socketID,
+          color: color
         }
+        await socket.emit("send_message", messageData);
+        setMessageList((list) => [...list, messageData]);
+        await socket.emit("send_video", {videoID, room})
+        setCurrentVideo(videoID);
         setVideo("");
     }
     else {
       alert("Invalid Link")
     }
   }
-
-  useEffect(() => {
-    socket.off("receive_video").on("receive_video", (data) => {
-      setVideoQueue((list) => [...list, data]);
-      if (videoQueue.length == 1) {
-        setCurrentVideo(videoQueue[0].videoID);
-      }
-    });
-  }, [socket]);
 
   const opts = {
     height: '500',
@@ -68,25 +62,9 @@ function Room({ socket, username, room, socketID, color }) {
     },
   }
 
-  // Play next video in queue 
-  const playNext = async() => {
-    // Update Video Queue
-    setVideoQueue((videos) => videos.filter((_, index) => index !== 0));
-    console.log(videoQueue[0]);
-    await socket.emit("play_next", room);
-    // Set new videoQueue[0] to currentVideo
-    if (videoQueue[0].videoID == null) {
-      setCurrentVideo("");
-    }
-    else {
-      setCurrentVideo(videoQueue[0].videoID)
-    }
-  }
-
   useEffect(() => {
-    socket.off("update_play_next").on("update_play_next", (data) => {
-      setVideoQueue((videos) => videos.filter((_, index) => index !== 0));
-      setCurrentVideo(videoQueue[0].videoID)
+    socket.off("receive_video").on("receive_video", (data) => {
+      setCurrentVideo(data);
     });
   }, [socket]);
 
@@ -96,39 +74,6 @@ function Room({ socket, username, room, socketID, color }) {
         You are in Room: {room}
       </div>
       <div class="mt-5 justify-around flex flex-row w-full h-96">
-        <div class="flex flex-col w-2/5">
-          <div class="bg-gray-800 py-2 rounded-t-3xl text-white">
-          YouTube Video Queue
-          </div>
-          <div class="bg-gray-700 text-white overflow-y-auto h-full">
-            <ScrollToBottom>
-              {videoQueue.map((videoData, index) => {
-                return (
-                  <div key={index}>
-                    <div class="justify-around flex flex-row px-4 py-1 border-b border-gray-500 min-w-full min-h-fit overflow-hidden inline"> 
-                      <p class="text-left inline break-words">https://www.youtube.com/watch?v={videoData.videoID}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </ScrollToBottom>
-          </div>
-          <div class="flex flex-row justify-around bg-gray-800 rounded-b-3xl p-2">
-            <input
-              class="text-black bg-neutral-50 shadow appearance-none border rounded py-1 w-3/5 px-3 placeholder:text-black leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={video}
-              placeholder="Enter YouTube Link Here"
-              onChange={(event) => {
-                setVideo(event.target.value);
-              }}
-              onKeyPress={(event) => {
-                event.key === "Enter" && validateYouTubeUrl();
-              }}
-            />
-            <button class="text-white bg-red-600 px-4 rounded" onClick={validateYouTubeUrl}>Send</button>
-          </div>
-        </div>
         <div class="flex flex-col w-2/5">
           <div class="bg-gray-800 py-2 rounded-t-3xl text-white">
           Live Chat
@@ -164,11 +109,29 @@ function Room({ socket, username, room, socketID, color }) {
             </div>
         </div>
       </div>
+      <div class="self-center mt-5 mb-5 flex flex-col w-96">
+        <div class="bg-gray-800 py-2 rounded-t-3xl text-white">
+        Enter YouTube Video Link Here:
+        </div>
+        <div class="flex flex-row justify-around bg-gray-800 rounded-b-3xl p-2">
+          <input
+            class="text-black bg-neutral-50 shadow appearance-none border rounded py-1 w-3/5 px-3 placeholder:text-black leading-tight focus:outline-none focus:shadow-outline"
+            type="text"
+            value={video}
+            placeholder="Enter YouTube Link Here"
+            onChange={(event) => {
+              setVideo(event.target.value);
+            }}
+            onKeyPress={(event) => {
+              event.key === "Enter" && validateYouTubeUrl();
+            }}
+          />
+          <button class="text-white bg-red-600 px-4 rounded" onClick={validateYouTubeUrl}>Send</button>
+        </div>
+      </div>
         {currentVideo}
       <div class="flex self-center mt-5 align-center">
-        <YouTube videoId={currentVideo} opts={opts} onEnd={playNext}/>
-        
-        <button onClick={playNext}> Press to Skip </button>
+        <YouTube videoId={currentVideo} opts={opts}/>
       </div>
     </div>
   );

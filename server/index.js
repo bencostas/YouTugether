@@ -32,15 +32,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_video", (data) => {
-    socket.to(data.room).emit("receive_video", data);
+    socket.to(data.room).emit("receive_video", data.videoID);
+  });
+
+  socket.on("play_next", (data) => {
+    socket.to(data.room).emit("update_play_next", data.index);
   });
 
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
-  });
-
-  socket.on("play_next", (data) => {
-    socket.to(data).emit("update_play_next", data);
   });
 });
 
