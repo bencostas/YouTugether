@@ -3,4 +3,4 @@
 Multi-user chat application which allows users to watch YouTube videos synchronously in the same room.
 - Built using React.js, Express.js, Node.js, and Socket.io
 
-![](https://github.com/bencostas/YouTugether/blob/main/YouTugether%20Demo.gif)
+![](https://raw.githubusercontent.com/bencostas/YouTugether/blob/main/YouTugether%20Demo.gif)
